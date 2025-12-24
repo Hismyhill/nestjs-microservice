@@ -1,8 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { MediaModule } from './media.module';
+import { Logger } from '@nestjs/common';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.create(MediaModule);
-  await app.listen(process.env.port ?? 3000);
+  process.title = 'Media';
+
+  const logger = new Logger('MediaBoostrap');
+
+  const port = Number(process.env.MEDIA_TCP_PORT ?? 4013);
+
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    MediaModule,
+    {
+      transport: Transport.TCP,
+      options: {
+        host: '0.0.0.0',
+        port,
+      },
+    },
+  );
+
+  app.enableShutdownHooks();
+
+  await app.listen();
+
+  logger.log(`🎞️  Media Service is running on: http://localhost:${port}`);
 }
 bootstrap();
