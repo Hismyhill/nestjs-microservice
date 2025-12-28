@@ -10,13 +10,11 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async upsertUser(input: {
+  async upsertAuthUser(input: {
     name: string;
     clerkUserId: string;
     email: string;
-    role: string;
-    lastSeenAt: string;
-  }) {
+  }): Promise<UserDocument> {
     const now = new Date();
 
     await this.userModel.findOneAndUpdate(
@@ -42,9 +40,11 @@ export class UserService {
         setDefaultsOnInsert: true,
       },
     );
+
+    return this.findByclerkUserId(input.clerkUserId) as Promise<UserDocument>;
   }
 
   async findByclerkUserId(clerkUserId: string) {
-    return this.userModel.findById(clerkUserId);
+    return this.userModel.findOne({ clerkUserId });
   }
 }

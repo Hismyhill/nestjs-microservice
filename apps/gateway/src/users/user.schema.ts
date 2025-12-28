@@ -20,6 +20,7 @@ export class User {
   @Prop({ default: false })
   isAdmin?: boolean;
 
+  @Prop({ default: new Date() })
   lastSeenAt: Date;
 }
 
