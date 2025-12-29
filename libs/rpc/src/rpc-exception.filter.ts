@@ -6,17 +6,14 @@ import { RpcErrorPayload } from './rpc.types';
 export class RpcAllExceptionFilter extends BaseRpcExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     if (exception instanceof RpcException) {
-      const status = exception?.getStatus();
-      const ctx = host.switchToHttp();
-      const response = ctx.getResponse();
+      const error = exception.getError();
 
-      if (status === 400) {
+      if (error['statusCode'] === 400) {
         const payload: RpcErrorPayload = {
           code: 'VALIDATION_ERROR',
           message: 'Validation failed',
-          details: response,
+          details: exception.message, // Or extract relevant details from the exception
         };
-
         return super.catch(new RpcException(payload), host);
       }
     }

@@ -5,11 +5,10 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Payload } from '@nestjs/microservices';
 
 export function mapRpcErrorToHttp(err: any): never {
   const payload = err?.error ?? err;
-  const code = Payload?.code as string | undefined;
+  const code = payload?.code as string | undefined;
 
   const message = payload?.message ?? 'Request failed';
 
