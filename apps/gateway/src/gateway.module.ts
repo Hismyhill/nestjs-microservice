@@ -14,7 +14,7 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     // connect our gateway to mongodb
-    MongooseModule.forRoot(process.env.MONGODB_URI as string),
+    MongooseModule.forRoot(process.env.MONGODB_URI_USERS as string),
     AuthModule,
     ClientsModule.register([
       {
