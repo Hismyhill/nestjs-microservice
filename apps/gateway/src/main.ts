@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { GatewayModule } from './gateway.module';
 import { Logger } from '@nestjs/common';
+import { HttpExceptionFilter } from '../../../libs/rpc/src/http/http-exception.filter';
 
 async function bootstrap() {
   process.title = 'gateway';
@@ -8,6 +9,8 @@ async function bootstrap() {
   const logger = new Logger('GatewayBoostrap');
 
   const app = await NestFactory.create(GatewayModule);
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   app.enableShutdownHooks();
 

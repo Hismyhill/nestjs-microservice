@@ -2,15 +2,35 @@ import {
   BadRequestException,
   ForbiddenException,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 
-export function mapRpcErrorToHttp(err: any): never {
-  const payload = err?.error ?? err;
-  const code = payload?.code as string | undefined;
+const logger = new Logger('RpcErrorMapper');
 
-  const message = payload?.message ?? 'Request failed';
+export function mapRpcErrorToHttp(err: any): never {
+  console.error('=== Raw RPC Error ===');
+  console.error(JSON.stringify(err, null, 2));
+  logger.error('Raw RPC Error:', err);
+
+  // Handle different error structures from RMQ
+  let payload = err;
+
+  // If error is wrapped in .error property
+  if (err?.error) {
+    payload = err.error;
+  }
+
+  // If error is an RpcException with error property
+  if (payload?.error && typeof payload.error === 'object') {
+    payload = payload.error;
+  }
+
+  const code = payload?.code as string | undefined;
+  const message = payload?.message ?? err?.message ?? 'Request failed';
+
+  console.error(`Code: ${code}, Message: ${message}`);
 
   if (code === 'VALIDATION_ERROR' || code === 'BAD_REQUEST') {
     throw new BadRequestException(message);
@@ -28,5 +48,10 @@ export function mapRpcErrorToHttp(err: any): never {
     throw new ForbiddenException(message);
   }
 
+  if (code === 'INTERNAL_SERVER_ERROR') {
+    throw new InternalServerErrorException(message);
+  }
+
+  // Default case - throw as internal server error with the actual error message
   throw new InternalServerErrorException(message);
 }

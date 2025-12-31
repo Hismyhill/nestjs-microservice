@@ -3,7 +3,7 @@ import { ProductService } from './product.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateProductDto, GetProductByIdDto } from './product-dto';
 
-@Controller('products')
+@Controller()
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
